@@ -1,0 +1,19 @@
+# rsyslog forward to logstash
+rsyslog:
+  build: rsyslog
+  ports:
+    - "127.0.0.1:514:514/udp"
+logstash:
+  build: logstash
+  volumes:
+    - "logstash/logstash.conf:/logstash.conf"
+    - "certs:/opt/certs"
+  command: -f /logstash.conf
+forwarder:
+  image: digitalwonderland/logstash-forwarder
+  volumes:
+    - "/var/run/docker.sock:/var/run/docker.sock"
+    - "/var/lib/docker:/var/lib/docker:ro"
+    - "certs:/mnt/logstash-forwarder"
+  links:
+    - logstash:logstash
